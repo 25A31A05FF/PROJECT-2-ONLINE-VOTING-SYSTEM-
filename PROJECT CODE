@@ -1,0 +1,177 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <unordered_map>
+
+using namespace std;
+
+// Structure to hold candidate information
+struct Candidate {
+    int id;
+    string name;
+    string party;
+    int votes;
+};
+
+// Class to manage the Voting System operations
+class VotingSystem {
+private:
+    vector<Candidate> candidates;
+    
+    // Hash map to track voter IDs and prevent double voting
+    // Key: Voter ID string, Value: boolean (true if already voted)
+    unordered_map<string, bool> voters; 
+    
+    int nextCandidateId = 1;
+
+public:
+    // Constructor directly populating some default candidates
+    VotingSystem() {
+        addCandidate("Alice Smith", "Democratic Party");
+        addCandidate("Bob Johnson", "Republican Party");
+        addCandidate("Charlie Brown", "Independent");
+    }
+
+    // Function to add a new candidate dynamically (if needed)
+    void addCandidate(const string& name, const string& party) {
+        Candidate newCandidate;
+        newCandidate.id = nextCandidateId++;
+        newCandidate.name = name;
+        newCandidate.party = party;
+        newCandidate.votes = 0;
+        candidates.push_back(newCandidate);
+    }
+
+    // Function to display available candidates
+    void displayCandidates() const {
+        cout << "\n--- List of Candidates ---" << endl;
+        for (const auto& c : candidates) {
+            cout << c.id << " | " << c.name << " (" << c.party << ")" << endl;
+        }
+        cout << "--------------------------" << endl;
+    }
+
+    // Function to handle the voting process
+    void castVote() {
+        string voterID;
+        cout << "\nEnter your Voter ID to proceed: ";
+        cin >> voterID;
+
+        // Verify if the voter has already cast a vote
+        if (voters.find(voterID) != voters.end() && voters[voterID] == true) {
+            cout << "\n[!] Access Denied: A vote has already been cast using this Voter ID." << endl;
+            return;
+        }
+
+        displayCandidates();
+
+        int candidateChoice;
+        cout << "Enter the ID of the candidate you want to vote for: ";
+        
+        if (!(cin >> candidateChoice)) {
+            cout << "\n[!] Invalid input. Returning to main menu." << endl;
+            cin.clear(); // clear error flags
+            cin.ignore(10000, '\n'); // clear input buffer
+            return;
+        }
+
+        // Process vote
+        bool candidateFound = false;
+        for (auto& c : candidates) {
+            if (c.id == candidateChoice) {
+                c.votes++; // Increment candidate's vote count
+                voters[voterID] = true; // Mark this voter ID as 'voted'
+                candidateFound = true;
+                
+                cout << "\n[SUCCESS] Your vote has been successfully recorded for " << c.name << "!" << endl;
+                break;
+            }
+        }
+
+        if (!candidateFound) {
+            cout << "\n[!] Error: Invalid Candidate ID entered. Vote NOT recorded." << endl;
+        }
+    }
+
+    // Function to display current voting results and declare winner
+    void showResults() const {
+        cout << "\n=== LIVE VOTING RESULTS ===" << endl;
+        if (candidates.empty()) {
+            cout << "No candidates available." << endl;
+            return;
+        }
+
+        int totalVotes = 0;
+        int maxVotes = 0;
+        string leaderNames = ""; // string to handle ties
+
+        for (const auto& c : candidates) {
+            cout << c.name << " (" << c.party << "): " << c.votes << " votes" << endl;
+            totalVotes += c.votes;
+            
+            // Logic to find current leader
+            if (c.votes > maxVotes) {
+                maxVotes = c.votes;
+                leaderNames = c.name;
+            } else if (c.votes == maxVotes && maxVotes > 0) {
+                leaderNames += " & " + c.name; // In case of a tie
+            }
+        }
+
+        cout << "---------------------------" << endl;
+        cout << "Total Votes Cast Overall: " << totalVotes << endl;
+        
+        if (totalVotes == 0) {
+            cout << "No votes have been cast yet." << endl;
+        } else {
+            cout << "CURRENT LEADER(S): " << leaderNames << " with " << maxVotes << " votes!" << endl;
+        }
+        cout << "===========================" << endl;
+    }
+};
+
+// Main execution block
+int main() {
+    VotingSystem system;
+    int choice;
+
+    cout << "*********************************" << endl;
+    cout << "*  SECURE ONLINE VOTING SYSTEM  *" << endl;
+    cout << "*********************************" << endl;
+
+    do {
+        cout << "\n============= MENU ============" << endl;
+        cout << "1. Cast Your Vote" << endl;
+        cout << "2. View Candidates List" << endl;
+        cout << "3. Show Live Voting Results" << endl;
+        cout << "4. Exit Application" << endl;
+        cout << "===============================" << endl;
+        cout << "Enter your choice (1-4): ";
+        
+        if (!(cin >> choice)) {
+            cout << "\n[!] Invalid input. Please enter a number." << endl;
+            cin.clear();
+            cin.ignore(10000, '\n');
+            continue;
+        }
+
+        switch (choice) {
+            case 1:
+                system.castVote();
+                break;
+            case 2:
+                system.displayCandidates();
+                break;
+            case 3:
+                system.showResults();
+                break;
+            case 4:
+                cout << "\nExiting System. Thank you for participating in democracy!" << endl;
+                break;
+            default:
+                cout << "\n[!] Invalid choice. Please select an option between 1 and 4." << endl;
+        }
+    } while (choice != 4);
+
+    return 0;
+}
