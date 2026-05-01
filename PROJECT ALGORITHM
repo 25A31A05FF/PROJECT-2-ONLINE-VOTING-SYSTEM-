@@ -1,0 +1,49 @@
+Algorithm: Online Voting System
+
+Step 1: Start
+
+Step 2: User Registration
+
+Input: Name, ID, password
+Store user details in database
+Mark user as “Not Voted”
+
+Step 3: User Login
+
+User enters ID and password
+If credentials are correct → go to next step
+Else → show error and stop
+
+Step 4: Check Voting Status
+
+If user has already voted → display “You have already voted” and stop
+Else → allow voting
+
+Step 5: Display Candidates
+
+Show list of candidates/options
+
+Step 6: Cast Vote
+
+User selects one candidate
+Confirm selection
+
+Step 7: Store Vote
+
+Record vote securely in database
+Update user status to “Voted”
+
+Step 8: Logout
+
+End user session
+
+Step 9: Counting Votes (Admin)
+
+Admin retrieves all votes
+Count votes for each candidate
+
+Step 10: Display Results
+
+Show total votes and winner
+
+Step 11: End
